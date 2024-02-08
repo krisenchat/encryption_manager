@@ -1,0 +1,50 @@
+name: Publish Python Package to Artifact Registry
+
+on:
+  push:
+    branches: [main]
+
+env:
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  REPOSITORY_NAME: encryption-manager-lib
+  ARTIFACT_REGISTRY_LOCATION: europe-west3
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout current repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+
+      - name: Build package
+        run: |
+          python setup.py sdist bdist_wheel
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.2.1
+        with:
+          service_account_key: ${{ secrets.ARTIFACT_REGISTRY_KEY }}
+          export_default_credentials: true
+
+      - name: Configure Artifact Registry
+        run: |
+          gcloud auth configure-docker $ARTIFACT_REGISTRY_LOCATION-docker.pkg.dev
+
+      - name: Publish package to Artifact Registry
+        run: |
+          python -m twine upload \
+            --repository-url https://$ARTIFACT_REGISTRY_LOCATION-python.pkg.dev/$PROJECT_ID/$REPOSITORY_NAME/ \
+            --username _json_key \
+            --password "${{ secrets.ARTIFACT_REGISTRY_KEY_DEV }}" \
+            dist/*
