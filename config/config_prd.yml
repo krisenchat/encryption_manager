@@ -1,0 +1,6 @@
+credentials:
+  project_id: "data-warehouse-338012"
+  service_account: "etl-service-account@data-warehouse-338012.iam.gserviceaccount.com"
+
+
+use_local_embeddings: "False"
