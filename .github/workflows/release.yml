@@ -35,10 +35,9 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.ARTIFACT_REGISTRY_KEY_DEV }}
         run: |
-          echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | gcloud auth activate-service-account --key-file=-
+          gcloud auth activate-service-account --key-file=- <<< "$GOOGLE_APPLICATION_CREDENTIALS_JSON"
           ACCESS_TOKEN=$(gcloud auth print-access-token)
           echo "ACCESS_TOKEN=${ACCESS_TOKEN}" >> $GITHUB_ENV
-      
       
 
       - name: Publish package to Artifact Registry
