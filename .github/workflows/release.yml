@@ -43,8 +43,9 @@ jobs:
 
       - name: Publish package to Artifact Registry
         run: |
-          python -m twine upload \
+          python -m twine upload --verbose \
             --repository-url https://$ARTIFACT_REGISTRY_LOCATION-python.pkg.dev/$PROJECT_ID/$REPOSITORY_NAME/ \
-            --username _json_key \
-            --password "${{ secrets.ARTIFACT_REGISTRY_KEY_DEV }}" \
+            --username oauth2accesstoken \
+            --password ${{ env.ACCESS_TOKEN }} \
             dist/*
+
