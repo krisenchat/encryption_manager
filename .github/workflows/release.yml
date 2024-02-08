@@ -8,6 +8,7 @@ env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   REPOSITORY_NAME: encryption-manager-lib
   ARTIFACT_REGISTRY_LOCATION: europe-west3
+  PYTHON_VERSION: '3.10'
 
 jobs:
   build_and_publish:
@@ -20,26 +21,26 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.10'
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dependencies
+      - name: Install packaging tools
         run: |
-          python -m pip install --upgrade pip
-          pip install setuptools wheel twine
+          python -m pip install --upgrade pip setuptools wheel twine
 
       - name: Build package
         run: |
           python setup.py sdist bdist_wheel
 
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.2.1
-        with:
-          service_account_key: ${{ secrets.ARTIFACT_REGISTRY_KEY }}
-          export_default_credentials: true
-
-      - name: Configure Artifact Registry
+      - name: Authenticate with Google Cloud and get access token
         run: |
-          gcloud auth configure-docker $ARTIFACT_REGISTRY_LOCATION-docker.pkg.dev
+          echo "${{ secrets.ARTIFACT_REGISTRY_KEY_DEV }}" > key.json
+          gcloud auth activate-service-account --key-file=key.json
+          ACCESS_TOKEN=$(gcloud auth print-access-token)
+          echo "ACCESS_TOKEN=${ACCESS_TOKEN}" >> $GITHUB_ENV
+          rm key.json  # Clean up
+        env:
+          GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.ARTIFACT_REGISTRY_KEY_DEV }}
 
       - name: Publish package to Artifact Registry
         run: |
@@ -48,4 +49,3 @@ jobs:
             --username oauth2accesstoken \
             --password ${{ env.ACCESS_TOKEN }} \
             dist/*
-
