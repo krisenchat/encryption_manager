@@ -33,14 +33,11 @@ jobs:
 
       - name: Authenticate with Google Cloud and get access token
         run: |
-          echo "${{ secrets.ARTIFACT_REGISTRY_KEY_DEV }}" > key.json
+          echo '${{ secrets.ARTIFACT_REGISTRY_KEY_DEV }}' > key.json
           gcloud auth activate-service-account --key-file=key.json
           ACCESS_TOKEN=$(gcloud auth print-access-token)
           echo "ACCESS_TOKEN=${ACCESS_TOKEN}" >> $GITHUB_ENV
           rm key.json  # Clean up
-        env:
-          GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
-          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.ARTIFACT_REGISTRY_KEY_DEV }}
 
       - name: Publish package to Artifact Registry
         run: |
