@@ -1,3 +1,0 @@
-credentials:
-  project_id: "kc-data-warehouse-uaprod"
-  service_account: "etl-user@kc-data-warehouse-uaprod.iam.gserviceaccount.com"

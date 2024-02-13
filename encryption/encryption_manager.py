@@ -7,12 +7,11 @@ from cryptography.hazmat.primitives import padding as sym_padding, padding
 from cryptography.hazmat.backends import default_backend
 from os import urandom
 
-from config_manager import ConfigManager
-
 class EncryptionManager:
-    def __init__(self, encryption_status):
+    def __init__(self, encryption_status, config_manager):
         self.encryption_status = encryption_status
         self.key_cache = {}  # Cache for storing key and IV
+        self.config_manager = config_manager
 
     def _get_current_key_and_iv(self, key_name):
         if key_name in self.key_cache:
@@ -20,7 +19,7 @@ class EncryptionManager:
             if datetime.datetime.now() - timestamp < datetime.timedelta(hours=1):  # 1 hour validity
                 return key, iv
             else:
-                ConfigManager.destroy_secret_version(key_name, version="latest")
+                self.config_manager.destroy_secret_version(key_name, version="latest")
 
         key = self._generate_symmetric_key()
         iv = urandom(16)
@@ -55,11 +54,11 @@ class EncryptionManager:
     def _save_key_and_iv(self, key_name, key, iv):
         # Convert the key and iv from bytes to a string for storage
         encoded_key_iv = b64encode(key + iv).decode('utf-8')
-        ConfigManager.save_secret_to_gcloud(key_name, encoded_key_iv)
+        self.config_manager.save_secret_to_gcloud(key_name, encoded_key_iv)
 
     def _retrieve_key_and_iv(self, key_name):
         # Fetch the combined key and IV
-        encoded_key_iv = ConfigManager.get_key_iv(key_name)
+        encoded_key_iv = self.config_manager.get_key_iv(key_name)
         key_iv = b64decode(encoded_key_iv)
         key, iv = key_iv[:32], key_iv[32:]
         return key, iv

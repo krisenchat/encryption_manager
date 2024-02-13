@@ -1,6 +1,0 @@
-credentials:
-  project_id: "kc-data-warehouse-stage"
-  service_account: "etl-user@kc-data-warehouse-stage.iam.gserviceaccount.com"
-
-
-use_local_embeddings: "False"
