@@ -9,6 +9,7 @@ from cryptography.hazmat.primitives import padding as sym_padding, padding
 from cryptography.hazmat.backends import default_backend
 from os import urandom
 
+
 class EncryptionManager:
     def __init__(self, encryption_status, config_manager):
         self.encryption_status = encryption_status
@@ -73,23 +74,27 @@ class EncryptionManager:
         return urandom(32)
 
     def _encrypt_data(self, data, key_name):
-        key, iv = self._get_current_key_and_iv(key_name)
+        try:
+            key, iv = self._get_current_key_and_iv(key_name)
 
-        # Ensure data is bytes
-        if isinstance(data, str):
-            data = data.encode('utf-8')
+            # Ensure data is bytes
+            if isinstance(data, str):
+                data = data.encode('utf-8')
 
-        elif isinstance(data, object):
-            data = pickle.dumps(data)
+            elif isinstance(data, object):
+                data = pickle.dumps(data)
 
-        # Encrypt the data
-        encryptor = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend()).encryptor()
-        padder = sym_padding.PKCS7(128).padder()
-        padded_data = padder.update(data) + padder.finalize()
-        encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
+            # Encrypt the data
+            encryptor = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend()).encryptor()
+            padder = sym_padding.PKCS7(128).padder()
+            padded_data = padder.update(data) + padder.finalize()
+            encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
 
-        return encrypted_data
+            return encrypted_data
 
+        except Exception as e:
+            print(f"Unable to encrypt data due to: {e}")
+            raise Exception
 
     def _decrypt_data(self, encrypted_data, key_name):
         key, iv = self._get_current_key_and_iv(key_name)
