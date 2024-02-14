@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from encryption_manager import EncryptionManager
-import base64
+from encryption.encryption_manager import EncryptionManager
+
 
 class TestEncryptionManager(unittest.TestCase):
     def setUp(self):
@@ -90,10 +90,5 @@ class TestEncryptionManager(unittest.TestCase):
         # Verify
         self.assertTrue(mock_cipher.called)
         self.assertIn(b'encrypted_data_partencrypted_data_final', encrypted_data)
-
-    from cryptography.hazmat.primitives import padding
-    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-    from cryptography.hazmat.backends import default_backend
-    import base64
 
 
