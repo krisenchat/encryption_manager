@@ -28,6 +28,9 @@ class EncryptionManager:
             if current_timestamp - stored_timestamp < 3600:  # Check validity
                 self.key_cache[key_name] = (key, iv, stored_timestamp)
                 return key, iv
+
+            self.config_manager.destroy_and_delete_secret(key_name, "latest")
+
         except Exception as e:
             # If retrieval fails, log the exception and proceed to generate a new key
             print(f"Error retrieving key: {e}")
