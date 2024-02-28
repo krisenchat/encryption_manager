@@ -111,7 +111,7 @@ class EncryptionManager:
         try:
             # Attempt to unpickle the decrypted data
             return pickle.loads(decrypted_data)
-        except (pickle.UnpicklingError, EOFError):
+        except Exception:
             # If an error occurs, assume the data is a string and decode it
             try:
                 return decrypted_data.decode('utf-8')
