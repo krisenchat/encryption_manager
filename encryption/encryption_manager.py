@@ -10,8 +10,8 @@ from os import urandom
 
 
 class EncryptionManager:
-    def __init__(self, encryption_status, config_manager):
-        self.encryption_status = encryption_status
+    def __init__(self, config_manager):
+        self.encryption_status = config_manager.get_encryption_status()
         self.key_cache = {}  # Cache for storing key and IV
         self.config_manager = config_manager
 
